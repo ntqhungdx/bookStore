@@ -36,7 +36,7 @@ services:
 
   elasticsearch:
     image: 'elasticsearch:8.12.1'
-    environment: ['ES_JAVA_OPTS=-Xms2g -Xmx2g','bootstrap.memory_lock=true','discovery.type=single-node','xpack.security.enabled=false', 'xpack.security.enrollment.enabled=false']
+    environment: ['ES_JAVA_OPTS=-Xms4g -Xmx4g','bootstrap.memory_lock=true','discovery.type=single-node','xpack.security.enabled=false', 'xpack.security.enrollment.enabled=false']
     ports:
       - 9200:9200
     volumes:
@@ -47,7 +47,16 @@ services:
         hard: -1
       nofile:
         soft: 65536
-        hard: 65536
+        hard: 131072
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.12.1
+    volumes:
+      - ./containers/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./containers/logstash/mysql-connector-j-8.0.33.jar:/usr/share/logstash/mysql-connector-j-8.0.33.jar
+    depends_on:
+      - db
+      - elasticsearch
 
 volumes:
   mysql-data:

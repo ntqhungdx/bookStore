@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Services\BookService;
 use Faker\Generator;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -19,13 +18,14 @@ class DatabaseSeeder extends Seeder
     {
         DB::table('books')->truncate();
         $total = 2000000;
-        $chunkSize = 400;
+        $chunkSize = 300;
 
         $books = $this->generateBookData($total, $chunkSize);
-        $bookService = resolve(BookService::class);
 
         foreach ($books as $chunk) {
-            $bookService->createBulk($chunk);
+            // Use query builder to insert data instead of Eloquent model via factory
+            // To prevent out of memory in low memory instance
+            DB::table('books')->insert($chunk);
         }
     }
 

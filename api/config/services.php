@@ -33,6 +33,6 @@ return [
 
     'elasticSearch' =>  [
         'default_index' =>  env('ELASTIC_SEARCH_INDEX', 'book_store'),
-        'default_field' =>  env('ELASTIC_SEARCH_FIELD_NAME', 'book_data'),
+        'default_field' =>  env('ELASTIC_SEARCH_FIELD_NAME', 'all_data'),
     ],
 ];

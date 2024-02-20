@@ -28,6 +28,18 @@ class ElasticSearch
             ];
 
             if ($client->indices()->exists($params)->getStatusCode() === 404) {
+                $params['body'] = [
+                    'mappings' => [
+                        '_source' => [
+                            'enabled' => true
+                        ],
+                        'properties'    =>  [
+                            'book_id' => [
+                                'type'  => 'keyword',
+                            ],
+                        ],
+                    ],
+                ];
                 $client->indices()->create($params);
             }
 
@@ -35,102 +47,6 @@ class ElasticSearch
         } catch (Exception $exception) {
             report($exception);
             return null;
-        }
-    }
-
-    /**
-     * Indexing a data
-     *
-     * @param string $data
-     * @param string $id
-     * @param string $fieldName
-     * @return void
-     */
-    public static function index(string $data, string $id, string $fieldName = ''): void
-    {
-        if (empty($data)) {
-            return;
-        }
-
-        $client = self::getClient();
-
-        if (empty($client)) {
-            return;
-        }
-
-        if (empty($fieldName)) {
-            $fieldName = config('services.elasticSearch.default_field');
-        }
-
-        $params = [
-            'index' =>  config('services.elasticSearch.default_index'),
-            'id'    =>  $id,
-            'body'  =>  [
-                $fieldName =>   $data,
-            ],
-        ];
-
-        try {
-            $client->index($params);
-        } catch (Exception $exception) {
-            report($exception);
-        }
-    }
-
-    /**
-     * Indexing multiple data
-     *
-     * @param array $data
-     * @param string $fieldName
-     * @return void
-     */
-    public static function bulkIndex(array $data, string $fieldName = ''): void
-    {
-        if (empty($data)) {
-            return;
-        }
-
-        $client = self::getClient();
-
-        if (empty($client)) {
-            return;
-        }
-
-        if (empty($fieldName)) {
-            $fieldName = config('services.elasticSearch.default_field');
-        }
-
-        $indexName = config('services.elasticSearch.default_index');
-
-        $params = ['body' => []];
-
-        try {
-            $totalItem = count($data);
-
-            for ($i = 0; $i < $totalItem; $i++) {
-                $params['body'][] = [
-                    'index' =>  [
-                        '_index'    =>  $indexName,
-                        '_id'       =>  $data[$i]['id'],
-                    ],
-                ];
-
-                $params['body'][] = [
-                    $fieldName =>   $data[$i]['text'],
-                ];
-
-                if ($i % 1000 === 0) {
-                    $client->bulk($params);
-                    $params = ['body' => []];
-                }
-            }
-
-            // Send the last batch if it exists
-            if (!empty($params['body'])) {
-                $client->bulk($params);
-            }
-        } catch (Exception $exception) {
-            report($exception);
         }
     }
 
@@ -161,6 +77,10 @@ class ElasticSearch
         $params = [
             'index' =>  config('services.elasticSearch.default_index'),
             'size'  =>  $limit,
+            'sort'  =>  [
+                '_score:desc',
+                'book_id:asc',
+            ],
             'body'  =>  [
                 'query' =>  [
                     'match' =>  [
