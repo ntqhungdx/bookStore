@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<ruleset name="Rule set"
+         xmlns="http://pmd.sf.net/ruleset/1.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+         xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+
+    <description>Custom rule set for PHPMD</description>
+
+    <exclude-pattern>*/bootstrap/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/public/*</exclude-pattern>
+    <exclude-pattern>*/storage/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <rule ref="rulesets/cleancode.xml">
+        <exclude name="StaticAccess" />
+    </rule>
+    <rule ref="rulesets/codesize.xml">
+        <exclude name="CyclomaticComplexity" />
+        <exclude name="NPathComplexity" />
+        <exclude name="ExcessiveMethodLength" />
+        <exclude name="ExcessiveClassLength" />
+        <exclude name="TooManyPublicMethods" />
+        <exclude name="ExcessiveClassComplexity" />
+    </rule>
+    <rule ref="rulesets/controversial.xml" />
+    <rule ref="rulesets/design.xml">
+        <exclude name="NumberOfChildren" />
+        <exclude name="CouplingBetweenObjects" />
+    </rule>
+    <rule ref="rulesets/naming.xml" >
+        <exclude name="ShortVariable"/>
+    </rule>
+    <rule ref="rulesets/unusedcode.xml" />
+
+    <rule ref="rulesets/naming.xml/ShortVariable"
+          since="0.2"
+          message="Avoid variables with short names like {0}. Configured minimum length is {1}."
+          class="PHPMD\Rule\Naming\ShortVariable"
+          externalInfoUrl="https://phpmd.org/rules/naming.html#shortvariable">
+        <priority>3</priority>
+        <properties>
+            <property name="minimum" description="Minimum length for a variable, property or parameter name" value="3"/>
+            <property name="exceptions" value="id,i,fp" />
+        </properties>
+    </rule>
+
+    <ini name="memory_limit" value="-1"/>
+</ruleset>

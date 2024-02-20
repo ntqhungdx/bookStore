@@ -1,0 +1,54 @@
+version: '3'
+services:
+  api:
+    build:
+      context: ./containers/php
+    image: ${COMPOSE_PROJECT_NAME}_api:latest
+    environment:
+      - APP_ENV=${APP_ENV:-local}
+    volumes:
+      - ../api:/var/www/html
+      - ./containers/php/php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - db
+    restart: "no"
+
+  db:
+    image: 'mysql:8.0'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD:-aw23sd@sW#45}'
+      MYSQL_DATABASE: '${DB_DATABASE:-bookstore}'
+      MYSQL_USER: '${DB_USERNAME:-BSuser001}'
+      MYSQL_PASSWORD: '${DB_PASSWORD:-ps#ser*23.hash}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-p${DB_PASSWORD:-ps#ser*23.hash}"]
+      retries: 3
+      timeout: 5s
+    restart: "no"
+
+  elasticsearch:
+    image: 'elasticsearch:8.12.1'
+    environment: ['ES_JAVA_OPTS=-Xms2g -Xmx2g','bootstrap.memory_lock=true','discovery.type=single-node','xpack.security.enabled=false', 'xpack.security.enrollment.enabled=false']
+    ports:
+      - 9200:9200
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+
+volumes:
+  mysql-data:
+  esdata01:
