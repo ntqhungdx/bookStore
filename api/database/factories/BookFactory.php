@@ -23,11 +23,21 @@ class BookFactory extends Factory
             $authors[] = $this->faker->firstName() . ' ' . $this->faker->lastName();
         }
 
+        $title = $this->faker->sentence(rand(3, 8));
+        $summary = $this->faker->realText();
+        $publisher = $this->faker->company();
+        $allData = implode("\n", array_merge([
+            $title,
+            $summary,
+            $publisher
+        ], $authors));
+
         return [
-            'title' =>  $this->faker->sentence(rand(3, 8)),
-            'summary'   =>  $this->faker->realText(),
-            'publisher' =>  $this->faker->company(),
-            'authors'   =>  $authors,
+            'title'         =>  $title,
+            'summary'       =>  $summary,
+            'publisher'     =>  $publisher,
+            'authors'       =>  json_encode($authors),
+            'all_data'      =>  $allData,
         ];
     }
 }

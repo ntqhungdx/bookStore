@@ -38,7 +38,7 @@ class BookService extends Service
         $books = $this->repository->getByIds($bookIds);
 
         // Transform result before return to controller
-        return array_map([$this, 'formatBook'], $books->all());
+        return array_map([$this, 'formatBook'], $books);
     }
 
     /**
