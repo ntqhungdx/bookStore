@@ -2,11 +2,12 @@
 
 namespace Tests\Feature\Services;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Mockery;
 use Tests\TestCase;
 use App\Services\BookService;
 use App\Models\Book;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BookServiceTest extends TestCase
 {
@@ -29,6 +30,9 @@ class BookServiceTest extends TestCase
      */
     public function testSearchByKeyword(): void
     {
+        // Truncate DB to make sure that the newly created record will have the ID is 1
+        DB::table('books')->truncate();
+
         // Create a sample book in the database
         Book::factory()->create([
             'title'     =>  'Harry Potter and the Sorcerer\'s Stone',
